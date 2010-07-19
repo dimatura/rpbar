@@ -1,4 +1,5 @@
 //  Copyright (C) 2010 Daniel Maturana
+//
 //  This file is part of rpbar.
 // 
 //  rpbar is free software: you can redistribute it and/or modify
@@ -38,40 +39,40 @@ Listener::~Listener() {
 }
 
 int Listener::start() {
-	struct addrinfo hints;
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET; // use IPv4
-	hints.ai_socktype = SOCK_DGRAM; // udp
-	hints.ai_flags = AI_PASSIVE; // use my IP
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_INET; // use IPv4
+  hints.ai_socktype = SOCK_DGRAM; // udp
+  hints.ai_flags = AI_PASSIVE; // use my IP
 
   struct addrinfo *servinfo;
-	int rv;
-	if ((rv = getaddrinfo(NULL, RPBAR_PORT, &hints, &servinfo)) != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-		return 1;
-	}
+  int rv;
+  if ((rv = getaddrinfo(NULL, RPBAR_PORT, &hints, &servinfo)) != 0) {
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+    return 1;
+  }
 
-	// loop through all the results and bind to the first we can
+  // loop through all the results and bind to the first we can
   struct addrinfo *p;
-	for(p = servinfo; p != NULL; p = p->ai_next) {
-		if ((sockfd_ = socket(p->ai_family, p->ai_socktype,
-				p->ai_protocol)) == -1) {
-			perror("listener: socket");
-			continue;
-		}
-		if (bind(sockfd_, p->ai_addr, p->ai_addrlen) == -1) {
-			close(sockfd_);
-			perror("listener: bind");
-			continue;
-		}
-		break;
-	}
+  for(p = servinfo; p != NULL; p = p->ai_next) {
+    if ((sockfd_ = socket(p->ai_family, p->ai_socktype,
+                          p->ai_protocol)) == -1) {
+      perror("listener: socket");
+      continue;
+    }
+    if (bind(sockfd_, p->ai_addr, p->ai_addrlen) == -1) {
+      close(sockfd_);
+      perror("listener: bind");
+      continue;
+    }
+    break;
+  }
 
-	if (p == NULL) {
-		fprintf(stderr, "listener: failed to bind socket\n");
-		return -1;
-	}
-	freeaddrinfo(servinfo);
+  if (p == NULL) {
+    fprintf(stderr, "listener: failed to bind socket\n");
+    return -1;
+  }
+  freeaddrinfo(servinfo);
   return 0;
 }
 

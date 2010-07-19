@@ -36,11 +36,10 @@ public:
   virtual ~Listener();
 private:
   int sockfd_;
-	char buf_[RPBAR_BUFSIZE];
+  char buf_[RPBAR_BUFSIZE];
 
   Listener (const Listener& other);
   Listener& operator=(const Listener& other);
-  
 };
 
 } /*  */
