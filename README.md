@@ -8,16 +8,16 @@ Intro
 [Here's a screenshot](http://github.com/downloads/dimatura/rpbar/shot.png).
 rpbar is the small bar at the bottom.
 
-The 'default' way to switch windows in Ratpoison is to press C-t-w to get the
+The 'default' way to switch windows in Ratpoison is to press `C-t-w` to get the
 window list, find the number of the window you want to switch to (let's say
-it's 2), and press C-t-2 to switch. rpbar is a simple taskbar that gives a
+it's 2), and press `C-t-2` to switch. rpbar is a simple taskbar that gives a
 permanent display of the windows in the current group in order to make the
-first C-t-w unnecesary. As a concession to The Rat, clicking on a window title
-will select that window.
+first `C-t-w` unnecesary. As a concession to The Rat, clicking on a window title
+will select that window. This is useful for one-handed window selection.
 
 The main inspiration is the simple task bars you get in other minimalistic
 window managers such as [Awesome](http://awesome.naquadah.org) or
-(wmii)[http://wmii.suckless.org]. rpbars appearance is modeled on these task
+[wmii](http://wmii.suckless.org). rpbar's appearance is modeled on these task
 bars.
 
 The other inspiration is [ratbar.pl](http://xenotrout.com/prog/ratbar/).
