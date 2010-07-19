@@ -31,7 +31,7 @@ How it works
 -------------
 rpbar is a pretty simple C++ project. It consists of two executables:
 
-- `rpbar` gets the window list from Ratpoison and displays
+- `rpbar` runs in the background. It gets the window list from Ratpoison and displays
   it using the [FLTK](http://www.fltk.org) library
 - `rpbarsend` sends a message to `rpbar`, telling it to refresh its window
   list. It should be invoked by Ratpoison hooks.
@@ -58,6 +58,8 @@ Then follow this steps:
         addhook switchframe exec rpbarsend
         addhook switchgroup exec rpbarsend
         addhook deletewindow exec rpbarsend
+        # The latest versions of RP have this hook
+        # addhook titlechanged exec rpbarsend
 
 1. Restart Ratpoison or manually execute `rpbar` (it should run in the background).
 
