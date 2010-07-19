@@ -5,7 +5,7 @@ rpbar
 Intro
 -----
 
-[Here's a screenshot](http://github.com/dimatura/rpbar/downloads/shot.png).
+[Here's a screenshot](http://github.com/downloads/dimatura/rpbar/shot.png).
 rpbar is the small bar at the bottom.
 
 The 'default' way to switch windows in Ratpoison is to press C-t-w to get the
@@ -30,10 +30,11 @@ as fast as it would be if it were part of Ratpoison, but it's pretty usable.
 How it works
 -------------
 rpbar is a pretty simple C++ project. It consists of two executables:
+
 - `rpbar` gets the window list from Ratpoison and displays
-it using the [FLTK](http://www.fltk.org) library
+  it using the [FLTK](http://www.fltk.org) library
 - `rpbarsend` sends a message to `rpbar`, telling it to refresh its window
-list. It should be invoked by Ratpoison hooks.
+  list. It should be invoked by Ratpoison hooks.
 
 Compilation and usage
 ---------------------
@@ -43,6 +44,7 @@ Obviously, you should have a working g++ toolchain.  You'll also need the
 you're using Debian or Ubuntu, what you need is in libfltk and libfltk-dev.
 
 Then follow this steps:
+
 1. Type `make` to compile.
 1. Put `rpbar` and `rpbarsend` in your path. 
 1. Add the following to your `.ratpoisonrc`:
