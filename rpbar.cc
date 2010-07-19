@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include <string>
-#include <list>
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -90,7 +89,7 @@ void RpBar::refresh(){
   size_t max_label_chars = button_width_pixels/RPBAR_PIXELS_PER_CHAR;
   int curx = 5;
 
-  Fl_Pack *pack = static_cast<Fl_Pack *>(this->child(0));
+  Fl_Pack *pack = (Fl_Pack *)(this->child(0));
   pack->clear();
 
   // TODO consider using a list<> instead of vector<>
