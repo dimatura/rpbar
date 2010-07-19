@@ -7,9 +7,10 @@
 
 #define RPBAR_BARHEIGHT         13
 #define RPBAR_BUFSIZE           2048
-#define RPBAR_PIXELS_PER_CHAR   7
-#define RPBAR_LABEL_SIZE        10 
 #define RPBAR_TIMEOUT_S         2
+#define RPBAR_BUTTON_MARGIN     10
+#define RPBAR_LABEL_FONT        0
+#define RPBAR_LABEL_SIZE        10 
 
 // mustang green
 //#define RPBAR_BGCOLOR           fl_rgb_color(0x10,0x10,0x10)

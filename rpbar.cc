@@ -26,6 +26,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <FL/fl_draw.H>
+
 #include "listener.hh"
 #include "settings.hh"
 #include "rpbar.hh"
@@ -86,7 +88,6 @@ void RpBar::refresh(){
   get_rp_info();
 
   int button_width_pixels = screen_width/windows.size();
-  size_t max_label_chars = button_width_pixels/RPBAR_PIXELS_PER_CHAR;
   int curx = 5;
 
   Fl_Pack *pack = (Fl_Pack *)(this->child(0));
@@ -100,17 +101,24 @@ void RpBar::refresh(){
     bool is_main_win = button_label[button_label.length()-1]=='*';
     button_label.erase(button_label.length()-1);
 
-    if (button_label.length() > max_label_chars) {
-      button_label.erase(max_label_chars+1, std::string::npos);
+    // font must be set before fl_width is called or it segfaults
+    fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
+    // shave off characters until the width is acceptable
+    while (fl_width(button_label.c_str()) > 
+           (button_width_pixels - RPBAR_BUTTON_MARGIN)) {
+      button_label.erase(button_label.length()-1);
     }
+
     // replace @ by # because FLTK has a special meaning for @. 
-    // TODO replace @ by @@
+    // TODO replace @ by @@, or alternatively use fl_draw with draw_symbols
+    // as false
     std::replace(button_label.begin(), button_label.end(), '@', '#');
 
     //x y w h
     Fl_Button* button = new Fl_Button(curx, 1, button_width_pixels, RPBAR_BARHEIGHT); 
     button->copy_label(button_label.c_str());
     button->box(FL_BORDER_BOX);
+    button->labelsize(RPBAR_LABEL_FONT);
     button->labelsize(RPBAR_LABEL_SIZE);
     button->align(FL_ALIGN_CENTER | FL_ALIGN_CLIP | FL_ALIGN_INSIDE);
     if (is_main_win) {
