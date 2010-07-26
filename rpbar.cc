@@ -96,7 +96,6 @@ void RpBar::refresh(){
   Fl_Pack *pack = (Fl_Pack *)(this->child(0));
   pack->clear();
 
-  // TODO consider using a list<> instead of vector<>
   for (std::vector<std::string>::iterator itr = windows.begin();
        itr != windows.end();
        ++itr) {

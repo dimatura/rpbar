@@ -33,19 +33,20 @@
 
 #include "settings.hh"
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char *argv[]) {
   int sockfd;
   struct addrinfo hints, *servinfo, *p;
   int rv;
   int numbytes;
-  const char *message = "m";
 
-#if 0
-  if (argc != 2) {
-    fprintf(stderr,"usage: rpbarsend message\n");
-    exit(1);
+  const char *default_message = "m";
+
+  const char *message;
+  if (argc == 2) {
+    message = argv[1];
+  } else {
+    message = default_message;
   }
-#endif
 
   memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_INET;
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
   for(p = servinfo; p != NULL; p = p->ai_next) {
     if ((sockfd = socket(p->ai_family, p->ai_socktype,
                          p->ai_protocol)) == -1) {
-      perror("talker: socket");
+      perror("rpbarsend: socket");
       continue;
     }
     break;

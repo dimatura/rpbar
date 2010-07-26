@@ -12,18 +12,6 @@
 #define RPBAR_LABEL_FONT        0
 #define RPBAR_LABEL_SIZE        10 
 
-// mustang green
-//#define RPBAR_BGCOLOR           fl_rgb_color(0x10,0x10,0x10)
-//#define RPBAR_FGCOLOR           fl_rgb_color(0x90,0x90,0x90)
-//#define RPBAR_MAINBGCOLOR       fl_rgb_color(0x20,0x20,0x20) 
-//#define RPBAR_MAINFGCOLOR       fl_rgb_color(0xb1,0xd6,0x31)
-
-// mustang orange
-//#define RPBAR_BGCOLOR           fl_rgb_color(0x10,0x10,0x10)
-//#define RPBAR_FGCOLOR           fl_rgb_color(0x90,0x90,0x90)
-//#define RPBAR_MAINBGCOLOR       fl_rgb_color(0x20,0x20,0x20) 
-//#define RPBAR_MAINFGCOLOR       fl_rgb_color(0xff,0x98,0x00)
-
 #define RPBAR_BGCOLOR           fl_rgb_color(0x08,0x08,0x08)
 #define RPBAR_FGCOLOR           fl_rgb_color(0xD0,0xD0,0xD0)
 #define RPBAR_MAINBGCOLOR       fl_rgb_color(0x20,0x20,0x20) 
