@@ -109,10 +109,13 @@ void RpBar::refresh(){
       button_label.erase(button_label.length()-1);
     }
 
-    // replace @ by # because FLTK has a special meaning for @. 
-    // TODO replace @ by @@, or alternatively use fl_draw with draw_symbols
-    // as false
-    std::replace(button_label.begin(), button_label.end(), '@', '#');
+    // replace @ by @@ because FLTK has a special meaning for @. 
+    size_t pos=0;
+    while ((pos = button_label.find('@', pos)) != std::string::npos) {
+      button_label.replace(pos, 1, "@@");
+      pos += 2;
+    }
+    //std::replace(button_label.begin(), button_label.end(), '@', '#');
 
     //x y w h
     Fl_Button* button = new Fl_Button(curx, 1, button_width_pixels, RPBAR_BARHEIGHT); 
@@ -140,12 +143,12 @@ void RpBar::refresh(){
 
 void button_cb(Fl_Widget* o, void* data) {
   Fl_Button* b=(Fl_Button*) o;
-  //std::cout << "Pressed: " << b->label() << std::endl;
   std::string cmd("ratpoison -c \"select ");
 
   const char * blabel = b->label();
   size_t num_end_pos = 0;
-  while (isdigit(blabel[num_end_pos])) {
+  while (num_end_pos < strlen(blabel) && 
+         isdigit(blabel[num_end_pos])) {
     ++num_end_pos;
   }
   cmd.append(blabel, num_end_pos);
