@@ -48,6 +48,9 @@ int RpBar::run() {
   int fd = listener.get_fd();
   Fl::add_fd(fd, static_fd_cb, this);
 
+  // font must be set before fl_width is called
+  fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
+
   // docs say I should use this for double buffering
   Fl::visual(FL_DOUBLE|FL_INDEX);
   this->show();
@@ -101,8 +104,6 @@ void RpBar::refresh(){
     bool is_main_win = button_label[button_label.length()-1]=='*';
     button_label.erase(button_label.length()-1);
 
-    // font must be set before fl_width is called or it segfaults
-    fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
     // shave off characters until the width is acceptable
     while (fl_width(button_label.c_str()) > 
            (button_width_pixels - RPBAR_BUTTON_MARGIN)) {
@@ -115,7 +116,6 @@ void RpBar::refresh(){
       button_label.replace(pos, 1, "@@");
       pos += 2;
     }
-    //std::replace(button_label.begin(), button_label.end(), '@', '#');
 
     //x y w h
     Fl_Button* button = new Fl_Button(curx, 1, button_width_pixels, RPBAR_BARHEIGHT); 
