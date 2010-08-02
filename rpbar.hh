@@ -67,6 +67,10 @@ private:
     ((RpBar *)data)->fd_cb();
   }
 
+  static void static_button_cb(Fl_Widget *o, void *data) {
+    ((RpBar *)data)->button_cb(o, data);
+  }
+
   void fd_cb() {
     listener.listen();
     refresh();
@@ -76,6 +80,8 @@ private:
     refresh();
     Fl::repeat_timeout(RPBAR_TIMEOUT_S, static_timeout_cb, this);
   }
+
+  void button_cb(Fl_Widget* o, void* data);
 
   void refresh();
 
@@ -92,7 +98,6 @@ private:
 };
 
 void rstrip(char *s);
-void button_cb(Fl_Widget* o, void* data);
 
 } /*  */
 

@@ -103,17 +103,17 @@ void RpBar::refresh(){
     bool is_main_win = button_label[button_label.length()-1]=='*';
     button_label.erase(button_label.length()-1);
 
-    // shave off characters until the width is acceptable
-    while (fl_width(button_label.c_str()) > 
-           (button_width_pixels - RPBAR_BUTTON_MARGIN)) {
-      button_label.erase(button_label.length()-1);
-    }
-
     // replace @ by @@ because FLTK has a special meaning for @. 
     size_t pos=0;
     while ((pos = button_label.find('@', pos)) != std::string::npos) {
       button_label.replace(pos, 1, "@@");
       pos += 2;
+    }
+
+    // shave off characters until the width is acceptable
+    while (fl_width(button_label.c_str()) > 
+           (button_width_pixels - RPBAR_BUTTON_MARGIN)) {
+      button_label.erase(button_label.length()-1);
     }
 
     //x y w h
@@ -132,7 +132,7 @@ void RpBar::refresh(){
       button->color(bgcolor);
       button->labelcolor(fgcolor);
     }
-    button->callback(button_cb);
+    button->callback(static_button_cb);
     pack->add(button);
     curx += button_width_pixels;
   }
@@ -140,10 +140,9 @@ void RpBar::refresh(){
   pack->redraw();
 }
 
-void button_cb(Fl_Widget* o, void* data) {
+void RpBar::button_cb(Fl_Widget* o, void* data) {
   Fl_Button* b=(Fl_Button*) o;
   std::string cmd("ratpoison -c \"select ");
-
   const char * blabel = b->label();
   size_t num_end_pos = 0;
   while (num_end_pos < strlen(blabel) && 
