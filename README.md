@@ -51,6 +51,8 @@ Then follow this steps:
 
         # tell ratpoison to ignore rpbar
         unmanage rpbar
+        # leave space for bars
+        set padding 0 14 0 14
         # start rpbar 
         exec rpbar
         # hooks
