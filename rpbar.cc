@@ -20,6 +20,11 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <signal.h>
 
 #include <string>
 #include <vector>
@@ -36,6 +41,7 @@ namespace rpbar
 {
 
 int RpBar::run() {
+
   listener.start();
   this->color(FL_BLACK);
   Fl_Pack* pack = new Fl_Pack(0, 0, this->w(), this->h());
@@ -44,9 +50,20 @@ int RpBar::run() {
   pack->init_sizes();
   this->add(pack);
 
-  Fl::add_timeout(0.1, static_timeout_cb, this);
-  int fd = listener.get_fd();
-  Fl::add_fd(fd, static_fd_cb, this);
+  int status = mkfifo(FIFOPATH, 0666); 
+  if (status==-1 && errno != EEXIST) {
+    perror("mkfifo");
+    exit(-1);
+  }
+
+  //pipe_in = fopen(FIFOPATH, "r");
+
+  Fl::add_timeout(0.0, static_timeout_cb, this);
+  //int fd = listener.get_fd();
+  //Fl::add_fd(fd, static_fd_cb, this);
+
+  int pipe_fd = open(FIFOPATH, O_RDONLY);
+  Fl::add_fd(pipe_fd, static_fd_cb, this);
 
   // font must be set before fl_width is called
   fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
@@ -63,6 +80,23 @@ void rstrip(char *s) {
     --n;
   } while (n >= 0 && isspace(s[n]));
   s[n+1] = '\0';
+}
+
+void RpBar::fd_cb(int fd) {
+  printf("fd_cb\n");
+  windows.clear();
+  FILE *stream = fdopen(fd, "r");
+  if (stream == NULL) {
+    perror("fdopen");
+    exit(1);
+  }
+  while(fgets(buffer, RPBAR_BUFSIZE, stream)) {
+    printf("buffer: %s", buffer);
+    rstrip(buffer);
+    windows.push_back(std::string(buffer));
+  }
+  printf("buffer: %s", buffer);
+  fclose(stream);
 }
 
 void RpBar::get_rp_info() {
@@ -90,12 +124,16 @@ void RpBar::get_rp_info() {
 void RpBar::refresh(){
   get_rp_info();
 
-  int button_width_pixels = screen_width/windows.size();
-  int curx = 5;
-
   Fl_Pack *pack = (Fl_Pack *)(this->child(0));
   pack->clear();
 
+  if (windows.empty()) { 
+    pack->redraw();
+    return; 
+  }
+
+  int button_width_pixels = screen_width/windows.size();
+  int curx = 5;
   for (std::vector<std::string>::iterator itr = windows.begin();
        itr != windows.end();
        ++itr) {
@@ -140,7 +178,7 @@ void RpBar::refresh(){
   pack->redraw();
 }
 
-void RpBar::button_cb(Fl_Widget* o, void* data) {
+void RpBar::button_cb(Fl_Widget* o) {
   Fl_Button* b=(Fl_Button*) o;
   std::string cmd("ratpoison -c \"select ");
   const char * blabel = b->label();

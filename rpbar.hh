@@ -34,6 +34,8 @@
 #include "settings.hh"
 #include "listener.hh"
 
+#define FIFOPATH "/tmp/rpbarfifo"
+
 namespace rpbar
 {
 
@@ -64,24 +66,27 @@ private:
   }
 
   static void static_fd_cb(int fd, void *data) {
-    ((RpBar *)data)->fd_cb();
+    ((RpBar *)data)->fd_cb(fd);
   }
 
   static void static_button_cb(Fl_Widget *o, void *data) {
-    ((RpBar *)data)->button_cb(o, data);
+    ((RpBar *)data)->button_cb(o);
   }
 
+#if 0
   void fd_cb() {
     listener.listen();
     refresh();
   }
+#endif
+  void fd_cb(int fd);
 
   void timeout_cb() {
     refresh();
     Fl::repeat_timeout(RPBAR_TIMEOUT_S, static_timeout_cb, this);
   }
 
-  void button_cb(Fl_Widget* o, void* data);
+  void button_cb(Fl_Widget* o);
 
   void refresh();
 
@@ -91,6 +96,7 @@ private:
 
   int screen_width;
   int screen_height;
+  
   Fl_Color bgcolor, fgcolor, mainbgcolor, mainfgcolor;
   Listener listener;
   char buffer[RPBAR_BUFSIZE];
