@@ -20,6 +20,12 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <assert.h>
 
 #include <string>
 #include <vector>
@@ -36,7 +42,6 @@ namespace rpbar
 {
 
 int RpBar::run() {
-  listener.start();
   this->color(FL_BLACK);
   Fl_Pack* pack = new Fl_Pack(0, 0, this->w(), this->h());
   pack->type(Fl_Pack::HORIZONTAL);
@@ -44,14 +49,20 @@ int RpBar::run() {
   pack->init_sizes();
   this->add(pack);
 
-  Fl::add_timeout(0.1, static_timeout_cb, this);
-  int fd = listener.get_fd();
-  Fl::add_fd(fd, static_fd_cb, this);
+  int status = mkfifo(RPBAR_FIFOPATH, 0666); 
+  if (status==-1 && errno != EEXIST) {
+    perror("mkfifo");
+    exit(-1);
+  }
+  Fl::add_timeout(0.0, static_timeout_cb, this);
+
+  int pipe_fd = open(RPBAR_FIFOPATH, O_RDONLY);
+  Fl::add_fd(pipe_fd, static_fd_cb, this);
 
   // font must be set before fl_width is called
   fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
 
-  // docs say I should use this for double buffering
+  // for double buffering
   Fl::visual(FL_DOUBLE|FL_INDEX);
   this->show();
   return Fl::run();
@@ -65,19 +76,29 @@ void rstrip(char *s) {
   s[n+1] = '\0';
 }
 
-void RpBar::get_rp_info() {
-  //%n = number
-  //%s = status
-  //%% = %
-  //%t = title
-  //%f = frame number
-  //%a = application name
-  //%c = resource class
+void RpBar::fd_cb(int fd) {
+  int numread;
+  while ((numread = read(fd, buffer, RPBAR_BUFSIZE))>0) {
+    // for now, we are ignoring the actual content of the message.
+  }
+  close(fd);
+  pipe_fd = open(RPBAR_FIFOPATH, O_RDONLY);
   windows.clear();
-  const char* cmd = "ratpoison -c \"windows \%n \%t\%s\"";
+  get_rp_info();
+  refresh();
+}
+
+void RpBar::timeout_cb() {
+  windows.clear();
+  get_rp_info();
+  refresh();
+  Fl::repeat_timeout(RPBAR_TIMEOUT_S, static_timeout_cb, this);
+}
+
+void RpBar::get_rp_info() {
   FILE* stream;
-  if ((stream = popen(cmd, "r"))==NULL) {
-    perror("popen failed");
+  if ((stream = popen(RPBAR_CMD, "r"))==NULL) {
+    perror("popen");
     exit(1);
   }
   while(fgets(buffer, RPBAR_BUFSIZE, stream)) {
@@ -88,14 +109,12 @@ void RpBar::get_rp_info() {
 }
 
 void RpBar::refresh(){
-  get_rp_info();
-
-  int button_width_pixels = screen_width/windows.size();
-  int curx = 5;
-
+  assert (!windows.empty());
   Fl_Pack *pack = (Fl_Pack *)(this->child(0));
   pack->clear();
 
+  int button_width_pixels = screen_width/windows.size();
+  int curx = 5;
   for (std::vector<std::string>::iterator itr = windows.begin();
        itr != windows.end();
        ++itr) {
@@ -140,7 +159,7 @@ void RpBar::refresh(){
   pack->redraw();
 }
 
-void RpBar::button_cb(Fl_Widget* o, void* data) {
+void RpBar::button_cb(Fl_Widget* o) {
   Fl_Button* b=(Fl_Button*) o;
   std::string cmd("ratpoison -c \"select ");
   const char * blabel = b->label();

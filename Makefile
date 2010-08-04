@@ -5,19 +5,13 @@ CXX=`fltk-config --cxx`
 CXXFLAGS=`fltk-config --cxxflags` `fltk-config --optim`
 LDFLAGS=`fltk-config --ldflags`
 
-all: rpbar rpbarsend
+all: rpbar
 
 rpbar.o: rpbar.cc rpbar.hh settings.hh
 
-listener.o: listener.cc listener.hh settings.hh
-
-rpbar: rpbar.o listener.o
-
-rpbarsend.o: rpbarsend.c
-
-rpbarsend: rpbarsend.o
+rpbar: rpbar.o
 
 clean:
-	rm *.o rpbar rpbarsend
+	rm *.o rpbar
 
 .PHONY: all clean
