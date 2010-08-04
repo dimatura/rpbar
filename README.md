@@ -5,7 +5,7 @@ rpbar
 Intro
 -----
 
-[Here's a screenshot](http://github.com/downloads/dimatura/rpbar/shot.png).
+[Here's a screenshot](http://github.com/downloads/dimatura/rpbar/shot2.png).
 rpbar is the small bar at the bottom.
 
 The 'default' way to switch windows in Ratpoison is to press `C-t-w` to get the
@@ -60,8 +60,10 @@ Then follow this steps:
         addhook switchframe exec rpbarsend
         addhook switchgroup exec rpbarsend
         addhook deletewindow exec rpbarsend
-        # The latest versions of RP have this hook
+        # RP versions >= 1.4.6 (from the git repo) have these hooks.
+        # Recommended!
         # addhook titlechanged exec rpbarsend
+        # addhook newwindow exec rpbarsend
 
 1. Restart Ratpoison or manually execute `rpbar` (it should run in the background).
 

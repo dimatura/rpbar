@@ -96,9 +96,7 @@ bool RpBar::init_gui() {
   //pack->spacing(5);
   pack->init_sizes();
   this->add(pack);
-  // font must be set before fl_width is called
   fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
-  // docs say I should use this for double buffering
   Fl::visual(FL_DOUBLE|FL_INDEX);
   return true;
 }
