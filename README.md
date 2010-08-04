@@ -29,12 +29,12 @@ as fast as it would be if it were part of Ratpoison, but it's pretty usable.
 
 How it works
 -------------
+rpbar is a pretty simple C++ project. It consists of two executables:
 
-rpbar is a pretty simple C++ project. It consists of a single executable,
-`rpbar`, which runs in the background and displays the window list using the
-[FLTK](http://www.fltk.org) library. It refreshes the window list whenever it
-receieves a message through a FIFO pipe. The messages are sent using
-Ratpoison's hook feature. 
+- `rpbar` runs in the background. It gets the window list from Ratpoison and displays
+  it using the [FLTK](http://www.fltk.org) library
+- `rpbarsend` sends a message to `rpbar`, telling it to refresh its window
+  list. It should be invoked by Ratpoison hooks.
 
 Compilation and usage
 ---------------------
@@ -56,12 +56,12 @@ Then follow this steps:
         # start rpbar 
         exec rpbar
         # hooks
-        addhook switchwin exec echo r > /tmp/rpbarfifo
-        addhook switchframe exec echo r > /tmp/rpbarfifo
-        addhook switchgroup exec echo r > /tmp/rpbarfifo
-        addhook deletewindow exec echo r > /tmp/rpbarfifo
+        addhook switchwin exec rpbarsend
+        addhook switchframe exec rpbarsend
+        addhook switchgroup exec rpbarsend
+        addhook deletewindow exec rpbarsend
         # The latest versions of RP have this hook
-        # addhook titlechanged exec echo r > /tmp/rpbarfifo
+        # addhook titlechanged exec rpbarsend
 
 1. Restart Ratpoison or manually execute `rpbar` (it should run in the background).
 
