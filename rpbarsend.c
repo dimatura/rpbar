@@ -15,11 +15,6 @@
 //  along with rpbar. If not, see <http://www.gnu.org/licenses/>.
 // 
 
-/*
- * based on talker.c fron beej's network guide, which is public 
- * domain
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,58 +22,46 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <fcntl.h>
 
 #include "settings.hh"
 
 int main(int argc, const char *argv[]) {
   int sockfd;
-  struct addrinfo hints, *servinfo, *p;
-  int rv;
+  struct sockaddr_un servaddr;
   int numbytes;
-
   const char *default_message = "m";
-
   const char *message;
+
   if (argc == 2) {
     message = argv[1];
   } else {
     message = default_message;
   }
 
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_INET;
-  hints.ai_socktype = SOCK_DGRAM;
-
-  if ((rv = getaddrinfo("localhost", RPBAR_PORT, &hints, &servinfo)) != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-    return 1;
+  if ((sockfd = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+      perror("client: socket");
+      exit(2);
   }
 
-  // loop through all the results and make a socket
-  for(p = servinfo; p != NULL; p = p->ai_next) {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                         p->ai_protocol)) == -1) {
-      perror("rpbarsend: socket");
-      continue;
-    }
-    break;
-  }
+  memset(&servaddr, 0, sizeof(servaddr));
+  servaddr.sun_family = AF_UNIX;
+  strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
 
-  if (p == NULL) {
-    fprintf(stderr, "failed to bind socket\n");
-    return 2;
-  }
-
-  if ((numbytes = sendto(sockfd, message, strlen(message), 0,
-                         p->ai_addr, p->ai_addrlen)) == -1) {
+  if ((numbytes = sendto(sockfd,
+                         message,
+                         strlen(message),
+                         0,
+                         (struct sockaddr *) &servaddr,
+                         sizeof(servaddr))) == -1) {
     perror("sendto");
     exit(1);
   }
-
-  freeaddrinfo(servinfo);
 
   close(sockfd);
   return 0;

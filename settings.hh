@@ -2,7 +2,7 @@
 #define SETTINGS_N7KJ765I
 
 #define RPBAR_WIN_NAME          "rpbar"
-#define RPBAR_PORT              "4950"
+#define RPBAR_SOCKET_PATH       "/tmp/rpbarsocket"
 #define RPBAR_SEP               "$)@="
 
 #define RPBAR_BARHEIGHT         13

@@ -32,7 +32,6 @@
 #include <FL/Fl_Pack.H>
 
 #include "settings.hh"
-#include "listener.hh"
 
 namespace rpbar
 {
@@ -45,6 +44,7 @@ public:
                 Fl::w(),
                 RPBAR_BARHEIGHT,
                 RPBAR_WIN_NAME),
+      sock_fd(-1),
       screen_width(Fl::w()),
       screen_height(Fl::h()),
       bgcolor(RPBAR_BGCOLOR),
@@ -71,28 +71,26 @@ private:
     ((RpBar *)data)->button_cb(o, data);
   }
 
-  void fd_cb() {
-    listener.listen();
-    refresh();
-  }
+  bool init_socket();
 
-  void timeout_cb() {
-    refresh();
-    Fl::repeat_timeout(RPBAR_TIMEOUT_S, static_timeout_cb, this);
-  }
+  bool init_gui();
+
+  void fd_cb();
+
+  void timeout_cb();
 
   void button_cb(Fl_Widget* o, void* data);
 
   void refresh();
 
-  virtual ~RpBar () { }
+  virtual ~RpBar();
 
   void get_rp_info();
 
+  int sock_fd;
   int screen_width;
   int screen_height;
   Fl_Color bgcolor, fgcolor, mainbgcolor, mainfgcolor;
-  Listener listener;
   char buffer[RPBAR_BUFSIZE];
   std::vector<std::string> windows;
 };
