@@ -34,7 +34,6 @@
 
 #include <FL/fl_draw.H>
 
-#include "listener.hh"
 #include "settings.hh"
 #include "rpbar.hh"
 
