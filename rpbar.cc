@@ -20,6 +20,16 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
 
 #include <string>
 #include <vector>
@@ -28,31 +38,83 @@
 
 #include <FL/fl_draw.H>
 
-#include "listener.hh"
 #include "settings.hh"
 #include "rpbar.hh"
 
 namespace rpbar
 {
 
-int RpBar::run() {
-  listener.start();
+RpBar::~RpBar() {
+  unlink(RPBAR_SOCKET_PATH);
+  close(sock_fd);
+}
+
+void RpBar::fd_cb() {
+  int numbytes;
+  if ((numbytes = recv(sock_fd,
+                       buffer,
+                       RPBAR_BUFSIZE-1,
+                       0))==-1) {
+    perror("recv");
+    return;
+  }
+  buffer[numbytes] = '\0';
+  // for now, ignore actual contents of message
+  refresh();
+}
+
+void RpBar::timeout_cb() {
+  refresh();
+  Fl::repeat_timeout(RPBAR_TIMEOUT_S, static_timeout_cb, this);
+}
+
+bool RpBar::init_socket() {
+  if ((sock_fd = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+    perror("socket");
+    return false;
+  }
+
+  struct sockaddr_un servaddr;
+  memset(&servaddr, NULL, sizeof(servaddr));
+  servaddr.sun_family = AF_UNIX;
+  strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
+  unlink(RPBAR_SOCKET_PATH);
+  if (bind(sock_fd,
+           (struct sockaddr *) &servaddr,
+           sizeof(servaddr)) < 0) {
+    perror("bind");
+    return false;
+  }
+
+  return true;
+}
+
+bool RpBar::init_gui() {
   this->color(FL_BLACK);
   Fl_Pack* pack = new Fl_Pack(0, 0, this->w(), this->h());
   pack->type(Fl_Pack::HORIZONTAL);
   //pack->spacing(5);
   pack->init_sizes();
   this->add(pack);
-
-  Fl::add_timeout(0.1, static_timeout_cb, this);
-  int fd = listener.get_fd();
-  Fl::add_fd(fd, static_fd_cb, this);
-
   // font must be set before fl_width is called
   fl_font(RPBAR_LABEL_FONT, RPBAR_LABEL_SIZE);
-
   // docs say I should use this for double buffering
   Fl::visual(FL_DOUBLE|FL_INDEX);
+  return true;
+}
+
+int RpBar::run() {
+  if (!init_socket()) {
+    return -1;
+  }
+
+  if (!init_gui()) {
+    return -1;
+  }
+
+  Fl::add_timeout(0.1, static_timeout_cb, this);
+  Fl::add_fd(sock_fd, static_fd_cb, this);
+
   this->show();
   return Fl::run();
 }

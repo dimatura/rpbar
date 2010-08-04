@@ -9,8 +9,6 @@ all: rpbar rpbarsend
 
 rpbar.o: rpbar.cc rpbar.hh settings.hh
 
-listener.o: listener.cc listener.hh settings.hh
-
 rpbar: rpbar.o listener.o
 
 rpbarsend.o: rpbarsend.c
