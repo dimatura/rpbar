@@ -9,7 +9,7 @@ all: rpbar rpbarsend
 
 rpbar.o: rpbar.cc rpbar.hh settings.hh
 
-rpbar: rpbar.o listener.o
+rpbar: rpbar.o
 
 rpbarsend.o: rpbarsend.c
 
