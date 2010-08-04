@@ -46,7 +46,7 @@ you're using Debian or Ubuntu, what you need is in libfltk and libfltk-dev.
 Then follow this steps:
 
 1. Type `make` to compile.
-1. Put `rpbar` in your path. 
+1. Put `rpbar` and `rpbarsend` in your path. 
 1. Add the following to your `.ratpoisonrc`:
 
         # tell ratpoison to ignore rpbar
