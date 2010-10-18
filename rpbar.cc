@@ -126,7 +126,8 @@ void RpBar::init_socket() {
 }
 
 void RpBar::init_font(const char *fontstr) {
-  // This function is pretty much copy+pasted is mostly from A. Garbe's dmenu
+  // This function is pretty much copy+pasted from A. Garbe's dmenu
+  // (http://tools.suckless.org/dmenu)
   if(!fontstr || fontstr[0] == '\0') {
     std::stringstream ss; ss << "Can not load font " << fontstr;
     throw RpBarException(ss.str());
@@ -165,7 +166,8 @@ void RpBar::init_font(const char *fontstr) {
 }
 
 void RpBar::init_gui() {
-  // This function has some copy+paste is mostly from A. Garbe's dmenu
+  // This function has some copy+paste from A. Garbe's dmenu
+  // (http://tools.suckless.org/dmenu)
   if (!(display = XOpenDisplay(0))) {
     throw RpBarException("Cannot open display\n");
   }
@@ -335,5 +337,6 @@ int main(int argc, const char *argv[]) {
   rpbar::RpBar rpbar;
   rpbar.run();
   // TODO catch exceptions? It wouldn't accomplish much.
+  // Leaving them at least allows core dump examination.
   return 0;
 }
