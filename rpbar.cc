@@ -38,35 +38,35 @@ namespace rpbar
 {
 
 unsigned long RpBar::get_color(const char *colstr) {
-	Colormap cmap = DefaultColormap(display, screen);
-	XColor color;
-	if(!XAllocNamedColor(display, cmap, colstr, &color, &color)) {
+  Colormap cmap = DefaultColormap(display, screen);
+  XColor color;
+  if(!XAllocNamedColor(display, cmap, colstr, &color, &color)) {
     std::stringstream ss; ss << "Can not allocate color " << colstr;
     throw RpBarException(ss.str());
   }
-	return color.pixel;
+  return color.pixel;
 }
 
 int RpBar::text_width(const std::string& text) {
-	XRectangle rect;
-	if(font.set) {
-		XmbTextExtents(font.set, text.c_str(), text.length(), NULL, &rect);
-    return rect.width; 
+  XRectangle rect;
+  if(font.set) {
+    XmbTextExtents(font.set, text.c_str(), text.length(), NULL, &rect);
+    return rect.width;
   }
-	return XTextWidth(font.xfont, text.c_str(), text.length());
+  return XTextWidth(font.xfont, text.c_str(), text.length());
 }
 
 RpBar::~RpBar() {
   unlink(RPBAR_SOCKET_PATH);
-	if(font.set) {
-		XFreeFontSet(display, font.set);
-  }	else {
-		XFreeFont(display, font.xfont);
+  if(font.set) {
+    XFreeFontSet(display, font.set);
+  } else {
+    XFreeFont(display, font.xfont);
   }
-	XFreePixmap(display, drawable);
-	XFreeGC(display, gc);
-	XDestroyWindow(display, win);
-	XCloseDisplay(display);
+  XFreePixmap(display, drawable);
+  XFreeGC(display, gc);
+  XDestroyWindow(display, win);
+  XCloseDisplay(display);
   close(sock_fd);
 }
 
@@ -171,8 +171,8 @@ void RpBar::init_gui() {
   if (!(display = XOpenDisplay(0))) {
     throw RpBarException("Cannot open display\n");
   }
-	screen = DefaultScreen(display);
-	root = RootWindow(display, screen);
+  screen = DefaultScreen(display);
+  root = RootWindow(display, screen);
   XSetWindowAttributes window_attribs;
   bordercolor = get_color(RPBAR_BORDERCOLOR);
   bgcolor = get_color(RPBAR_BGCOLOR);
@@ -199,8 +199,8 @@ void RpBar::init_gui() {
     XSetFont(display, gc, font.xfont->fid);
   }
   XMapRaised(display, win);
-	refresh();
-	XSync(display, false);
+  refresh();
+  XSync(display, false);
   x11_fd = ConnectionNumber(display);
 }
 
@@ -261,10 +261,10 @@ void RpBar::get_rp_info() {
 void RpBar::refresh(){
   get_rp_info();
   // blank out rectangle
-	XRectangle rect = { 0, 0, bar_w, bar_h };
-	XSetForeground(display, gc, bordercolor);
-	XFillRectangles(display, drawable, gc, &rect, 1);
-  
+  XRectangle rect = { 0, 0, bar_w, bar_h };
+  XSetForeground(display, gc, bordercolor);
+  XFillRectangles(display, drawable, gc, &rect, 1);
+
   int button_width_px = bar_w/windows.size();
   int curx = 1;
 
@@ -286,7 +286,7 @@ void RpBar::refresh(){
       bg = bgcolor;
       fg = fgcolor;
     }
-    
+
     // shave off characters until the width is acceptable
     while (text_width(button_label) > 
            (button_width_px - RPBAR_BUTTON_MARGIN)) {
@@ -312,8 +312,8 @@ void RpBar::refresh(){
     }
     curx += button_width_px+1;
   }
-	XCopyArea(display, drawable, win, gc, 0, 0, bar_w, bar_h, 0, 0);
-	XFlush(display);
+  XCopyArea(display, drawable, win, gc, 0, 0, bar_w, bar_h, 0, 0);
+  XFlush(display);
 }
 
 void RpBar::select_window(int win_ix) {
