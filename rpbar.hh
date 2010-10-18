@@ -18,81 +18,79 @@
 #ifndef RPBAR_Y2DAPIQS
 #define RPBAR_Y2DAPIQS
 
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdexcept>
+#include <sstream>
 
-#include <FL/Fl.H>
-#include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Pack.H>
+#include <X11/keysym.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include "settings.hh"
 
 namespace rpbar
 {
 
-class RpBar : public Fl_Double_Window {
+class RpBarException : public std::runtime_error {
 public:
-  RpBar () : 
-      Fl_Double_Window(0, 
-                Fl::h()-RPBAR_BARHEIGHT,
-                Fl::w(),
-                RPBAR_BARHEIGHT,
-                RPBAR_WIN_NAME),
-      sock_fd(-1),
-      screen_width(Fl::w()),
-      screen_height(Fl::h()),
-      bgcolor(RPBAR_BGCOLOR),
-      fgcolor(RPBAR_FGCOLOR),
-      mainbgcolor(RPBAR_MAINBGCOLOR),
-      mainfgcolor(RPBAR_MAINFGCOLOR)
-  { }
+  RpBarException(const std::string& what_arg) : 
+    std::runtime_error(what_arg) { }
+};
 
-  int run();
+struct Font {
+  XFontStruct *xfont;
+  XFontSet set;
+  int ascent;
+  int descent;
+  int height;
+};
+
+class RpBar {
+public:
+  RpBar() { }
+  ~RpBar();
+  void run();
 
 private:
   RpBar (const RpBar& other);
   RpBar& operator=(const RpBar& other);
 
-  static void static_timeout_cb(void *data) {
-    ((RpBar *)data)->timeout_cb();
-  }
-
-  static void static_fd_cb(int fd, void *data) {
-    ((RpBar *)data)->fd_cb();
-  }
-
-  static void static_button_cb(Fl_Widget *o, void *data) {
-    ((RpBar *)data)->button_cb(o, data);
-  }
-
-  bool init_socket();
-
-  bool init_gui();
-
-  void fd_cb();
-
-  void timeout_cb();
-
-  void button_cb(Fl_Widget* o, void* data);
+  void init_socket();
+  void init_font(const char *fontstr);
+  void init_gui();
 
   void refresh();
-
-  virtual ~RpBar();
+  void handle_fd();
+  void handle_timeout();
+  void handle_xev();
+  void select_window(int win_ix);
 
   void get_rp_info();
+  int textnw(const char *text, unsigned int len);
+  int text_width(const std::string& text);
+  unsigned long get_color(const char *colstr);
 
-  int sock_fd;
-  int screen_width;
-  int screen_height;
-  Fl_Color bgcolor, fgcolor, mainbgcolor, mainfgcolor;
+  int sock_fd, x11_fd;
+  fd_set fds;
+
+  int bar_x, bar_y, bar_w, bar_h;
+  unsigned long bordercolor, bgcolor, fgcolor, mainbgcolor, mainfgcolor;
+
   char buffer[RPBAR_BUFSIZE];
   std::vector<std::string> windows;
+
+  // X stuff
+  Font font;
+	Drawable drawable;
+	GC gc;
+  Display *display;
+  int screen;
+  Window root, win;
 };
 
 void rstrip(char *s);
