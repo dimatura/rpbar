@@ -5,7 +5,7 @@ rpbar
 Intro
 -----
 
-[Here's a screenshot](http://github.com/downloads/dimatura/rpbar/shot3.png).
+[Here's a screenshot](http://dimatura.net/shot3.png).
 rpbar is the small bar at the bottom. 
 
 The 'default' way to switch windows in Ratpoison is to press `C-t-w` to get the
