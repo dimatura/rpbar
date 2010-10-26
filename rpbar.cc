@@ -16,21 +16,23 @@
 // 
 #include "rpbar.hh"
 
+#include <arpa/inet.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/un.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
+#include <signal.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #include <algorithm>
 
@@ -48,10 +50,10 @@ unsigned long RpBar::get_color(const char *colstr) {
 }
 
 int RpBar::text_width(const std::string& text) {
-  XRectangle rect;
+  XRectangle backgnd_rect;
   if(font.set) {
-    XmbTextExtents(font.set, text.c_str(), text.length(), NULL, &rect);
-    return rect.width;
+    XmbTextExtents(font.set, text.c_str(), text.length(), NULL, &backgnd_rect);
+    return backgnd_rect.width;
   }
   return XTextWidth(font.xfont, text.c_str(), text.length());
 }
@@ -260,48 +262,46 @@ void RpBar::get_rp_info() {
 
 void RpBar::refresh(){
   get_rp_info();
-  // blank out rectangle
-  XRectangle rect = { 0, 0, bar_w, bar_h };
   XSetForeground(display, gc, bordercolor);
-  XFillRectangles(display, drawable, gc, &rect, 1);
+  XFillRectangle(display, drawable, gc, 0, 0, bar_w, bar_h);
 
-  int button_width_px = bar_w/windows.size();
-  int curx = 1;
+  int button_width = bar_w/windows.size();
+  int curx = 0;
 
   for (std::vector<std::string>::iterator itr = windows.begin();
        itr != windows.end();
        ++itr) {
     std::string& button_label(*itr);
-    bool is_main_win = button_label[button_label.length()-1]=='*';
-    button_label.erase(button_label.length()-1);
-
-    //decide colors
+    char last_char = button_label[button_label.length()-1];
+    // '*' -> main win
+    // '+' -> 'alternate' win
+    // '-' -> other
+    // else, it's a 'no managed windows' message.
+    if (last_char!='s') {
+      button_label.erase(button_label.length()-1);
+    }
+    // highlight current window 
     unsigned long bg, fg;
-    if (is_main_win) {
-      // main window
+    if (last_char=='*') {
       bg = mainbgcolor;
       fg = mainfgcolor;
     } else { 
-      // ordinary window
       bg = bgcolor;
       fg = fgcolor;
     }
-
     // shave off characters until the width is acceptable
     while (text_width(button_label) > 
-           (button_width_px - RPBAR_BUTTON_MARGIN)) {
+           (button_width - 2*RPBAR_BUTTON_MARGIN)) {
       button_label.erase(button_label.length()-1);
     }
-
-    //x y w h
-    XRectangle rect2 = { curx, 1, button_width_px, bar_h };
     XSetForeground(display, gc, bg);
-    XFillRectangles(display, drawable, gc, &rect2, 1);
-    //TODO use bar_h?
-    int h = font.ascent + font.descent;
-    int x = curx + (button_width_px - text_width(button_label))/2 + (h/2);
-    int y = (bar_h / 2) - (h / 2) + font.ascent;
-
+    // TODO handle this in a smarter way. 
+    int width = (itr==windows.end()-1)? bar_w - curx - 2 : button_width - 1;
+    XFillRectangle(display, drawable, gc, curx+1, 1, width, bar_h-2);
+    int x = curx + (button_width - text_width(button_label))/2;
+    int y = (bar_h / 2) - (font.height / 2) + font.ascent;
+    //int y = 1 + ((bar_h-1) - font.height)/2;
+    //int y = RPBAR_PADDING/2 + font.ascent + 1;
     XSetForeground(display, gc, fg);
     if(font.set) {
       XmbDrawString(display, drawable, font.set, gc, x, y,
@@ -310,7 +310,7 @@ void RpBar::refresh(){
       XDrawString(display, drawable, gc, x, y, button_label.c_str(),
                   button_label.length());
     }
-    curx += button_width_px+1;
+    curx += button_width;
   }
   XCopyArea(display, drawable, win, gc, 0, 0, bar_w, bar_h, 0, 0);
   XFlush(display);

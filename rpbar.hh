@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <stdexcept>
-#include <sstream>
 
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
@@ -71,10 +71,11 @@ private:
   void select_window(int win_ix);
 
   void get_rp_info();
-  int textnw(const char *text, unsigned int len);
   int text_width(const std::string& text);
   unsigned long get_color(const char *colstr);
 
+  // this class does too much stuff.
+  
   int sock_fd, x11_fd;
   fd_set fds;
 
