@@ -32,27 +32,26 @@
 #include "settings.hh"
 
 int main(int argc, const char *argv[]) {
-  int sockfd;
-  struct sockaddr_un servaddr;
-  int numbytes;
   const char *default_message = "m";
   const char *message;
-
   if (argc == 2) {
     message = argv[1];
   } else {
     message = default_message;
   }
 
+  int sockfd;
   if ((sockfd = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
-      perror("client: socket");
+      perror("socket");
       exit(2);
   }
 
+  struct sockaddr_un servaddr;
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sun_family = AF_UNIX;
   strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
 
+  int numbytes;
   if ((numbytes = sendto(sockfd,
                          message,
                          strlen(message),
@@ -66,4 +65,3 @@ int main(int argc, const char *argv[]) {
   close(sockfd);
   return 0;
 }
-

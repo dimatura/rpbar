@@ -95,6 +95,7 @@ private:
 };
 
 void rstrip(char *s);
+void rpbarsend(int argc, const char *argv[]);
 
 } /*  */
 
