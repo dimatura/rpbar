@@ -20,6 +20,6 @@ rpbarsend: rpbarsend.o settings.hh
 	${CXX} -o $@ $^ ${LIBS}
 
 clean:
-	rm *.o ${BIN}
+	rm -f *.o ${BIN}
 
 .PHONY: all clean
