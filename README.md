@@ -40,8 +40,8 @@ Compilation and usage
 ---------------------
 
 Obviously, you should have a working g++ toolchain. You'll also need Xlib. If
-you're using Ubuntu, what you need is in build-essential, libX11-6
-and libX11-dev. Then you should:
+you're using Ubuntu or Debian, what you need is in build-essential and libx11-dev.
+Then you should:
 
 1. Type `make` to compile.
 1. Put `rpbar` and `rpbarsend` in your path. 
