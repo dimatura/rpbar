@@ -1,19 +1,19 @@
 //  Copyright (C) 2010 Daniel Maturana
 //  This file is part of rpbar.
-// 
+//
 //  rpbar is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  rpbar is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-// 
+//
 //  You should have received a copy of the GNU General Public License
 //  along with rpbar. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 #include "rpbar.hh"
 
 #include <arpa/inet.h>
@@ -116,7 +116,7 @@ void RpBar::init_socket() {
     throw RpBarException("Error creating socket");
   }
   struct sockaddr_un servaddr;
-  memset(&servaddr, NULL, sizeof(servaddr));
+  memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sun_family = AF_UNIX;
   strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
   unlink(RPBAR_SOCKET_PATH);
@@ -185,7 +185,7 @@ void RpBar::init_gui() {
   window_attribs.override_redirect = 1;
   window_attribs.background_pixmap = ParentRelative;
   window_attribs.event_mask = ExposureMask | ButtonPressMask;
-  bar_h = font.height + RPBAR_PADDING; 
+  bar_h = font.height + RPBAR_PADDING;
   bar_x = 0;
   bar_y = DisplayHeight(display, screen) - bar_h;
   bar_w = DisplayWidth(display, screen);
@@ -280,22 +280,22 @@ void RpBar::refresh(){
     if (last_char!='s') {
       button_label.erase(button_label.length()-1);
     }
-    // highlight current window 
+    // highlight current window
     unsigned long bg, fg;
     if (last_char=='*') {
       bg = mainbgcolor;
       fg = mainfgcolor;
-    } else { 
+    } else {
       bg = bgcolor;
       fg = fgcolor;
     }
     // shave off characters until the width is acceptable
-    while (text_width(button_label) > 
+    while (text_width(button_label) >
            (button_width - 2*RPBAR_BUTTON_MARGIN)) {
       button_label.erase(button_label.length()-1);
     }
     XSetForeground(display, gc, bg);
-    // TODO handle this in a smarter way. 
+    // TODO handle this in a smarter way.
     int width = (itr==windows.end()-1)? bar_w - curx - 2 : button_width - 1;
     XFillRectangle(display, drawable, gc, curx+1, 1, width, bar_h-2);
     int x = curx + (button_width - text_width(button_label))/2;
@@ -320,7 +320,7 @@ void RpBar::select_window(int win_ix) {
   std::string cmd("ratpoison -c \"select ");
   std::string win(windows.at(win_ix));
   size_t num_end_pos = 0;
-  while (num_end_pos < win.length() && 
+  while (num_end_pos < win.length() &&
          isdigit(win.at(num_end_pos))) {
     ++num_end_pos;
   }
