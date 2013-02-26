@@ -142,11 +142,11 @@ void RpBar::init_font(const char *fontstr) {
     XFreeStringList(missing);
   }
   if(font.set) {
-    XFontSetExtents *font_extents;
+    //XFontSetExtents *font_extents;
     XFontStruct **xfonts;
     char **font_names;
     font.ascent = font.descent = 0;
-    font_extents = XExtentsOfFontSet(font.set);
+    //font_extents = XExtentsOfFontSet(font.set);
     n = XFontsOfFontSet(font.set, &xfonts, &font_names);
     for(i = 0, font.ascent = 0, font.descent = 0; i < n; i++) {
       if(font.ascent < (*xfonts)->ascent)
@@ -253,6 +253,7 @@ void RpBar::get_rp_info() {
   if ((stream = popen(cmd, "r"))==NULL) {
     throw RpBarException("popen failed");
   }
+  // TODO make sure this is The Right Way (tm)
   while(fgets(buffer, RPBAR_BUFSIZE, stream)) {
     rstrip(buffer);
     windows.push_back(std::string(buffer));

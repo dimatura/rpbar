@@ -1,19 +1,19 @@
 //  Copyright (C) 2010 Daniel Maturana
 //  This file is part of rpbar.
-// 
+//
 //  rpbar is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  rpbar is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-// 
+//
 //  You should have received a copy of the GNU General Public License
 //  along with rpbar. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 
 #ifndef RPBAR_Y2DAPIQS
 #define RPBAR_Y2DAPIQS
@@ -38,7 +38,7 @@ namespace rpbar
 
 class RpBarException : public std::runtime_error {
 public:
-  RpBarException(const std::string& what_arg) : 
+  RpBarException(const std::string& what_arg) :
     std::runtime_error(what_arg) { }
 };
 
@@ -75,7 +75,7 @@ private:
   unsigned long get_color(const char *colstr);
 
   // this class does too much stuff.
-  
+
   int sock_fd, x11_fd;
   fd_set fds;
 
