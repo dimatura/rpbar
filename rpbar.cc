@@ -59,7 +59,7 @@ int RpBar::text_width(const std::string& text) {
 }
 
 RpBar::~RpBar() {
-  unlink(RPBAR_SOCKET_PATH);
+  unlink(socket_path.c_str());
   if(font.set) {
     XFreeFontSet(display, font.set);
   } else {
@@ -118,8 +118,15 @@ void RpBar::init_socket() {
   struct sockaddr_un servaddr;
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sun_family = AF_UNIX;
-  strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
-  unlink(RPBAR_SOCKET_PATH);
+  // get user id to support multiple users at the same time
+  // since the socket is named file in /tmp
+  uid_t uid = geteuid();
+  std::stringstream ss;
+  ss << RPBAR_SOCKET_PATH << "-" << uid;
+  socket_path = ss.str();
+
+  strcpy(servaddr.sun_path, socket_path.c_str());
+  unlink(socket_path.c_str());
   if (bind(sock_fd,
            (struct sockaddr *) &servaddr,
            sizeof(servaddr)) < 0) {

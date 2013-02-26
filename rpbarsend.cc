@@ -1,33 +1,37 @@
 //  Copyright (C) 2010 Daniel Maturana
 //  This file is part of rpbar.
-// 
+//
 //  rpbar is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  rpbar is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-// 
+//
 //  You should have received a copy of the GNU General Public License
 //  along with rpbar. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/un.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <fcntl.h>
+#include <unistd.h>
+
+// TODO just use c stuff
+#include <string>
+#include <sstream>
 
 #include "settings.hh"
 
@@ -49,8 +53,13 @@ int main(int argc, const char *argv[]) {
   struct sockaddr_un servaddr;
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sun_family = AF_UNIX;
-  strcpy(servaddr.sun_path, RPBAR_SOCKET_PATH);
 
+  uid_t uid = geteuid();
+  std::stringstream ss;
+  ss << RPBAR_SOCKET_PATH << "-" << uid;
+  std::string socket_path(ss.str());
+
+  strcpy(servaddr.sun_path, socket_path.c_str());
   int numbytes;
   if ((numbytes = sendto(sockfd,
                          message,

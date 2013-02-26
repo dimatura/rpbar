@@ -27,9 +27,9 @@
 #include <string>
 #include <vector>
 
-#include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/keysym.h>
 
 #include "settings.hh"
 
@@ -78,6 +78,7 @@ private:
 
   int sock_fd, x11_fd;
   fd_set fds;
+  std::string socket_path;
 
   int bar_x, bar_y, bar_w, bar_h;
   unsigned long bordercolor, bgcolor, fgcolor, mainbgcolor, mainfgcolor;
