@@ -506,19 +506,19 @@ RpBar::load_font_for_codepoint(long codepoint)
 
   if (!FcPatternAddCharSet(fc_pattern_dup, FC_CHARSET, fc_charset)) {
     FcCharSetDestroy(fc_charset);
-    FcPatternDestroy(fc_pattern);
+    FcPatternDestroy(fc_pattern_dup);
     return NULL;
   }
 
   if (!FcPatternAddBool(fc_pattern_dup, FC_SCALABLE, FcTrue)) {
     FcCharSetDestroy(fc_charset);
-    FcPatternDestroy(fc_pattern);
+    FcPatternDestroy(fc_pattern_dup);
     return NULL;
   }
 
   if (!FcConfigSubstitute(NULL, fc_pattern_dup, FcMatchPattern)) {
     FcCharSetDestroy(fc_charset);
-    FcPatternDestroy(fc_pattern);
+    FcPatternDestroy(fc_pattern_dup);
     return NULL;
   }
 
@@ -531,7 +531,7 @@ RpBar::load_font_for_codepoint(long codepoint)
       &fc_result);
   if (!fc_pattern_match) {
     FcCharSetDestroy(fc_charset);
-    FcPatternDestroy(fc_pattern);
+    FcPatternDestroy(fc_pattern_dup);
     return NULL;
   }
 
