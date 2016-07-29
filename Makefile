@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-Os -Wall
 LIBS=-lX11 -lXft -lfontconfig
-INCLUDES=-I/usr/include/freetype2
+INCLUDES=`pkg-config --cflags fontconfig`
 
 BIN=rpbar rpbarsend
 
