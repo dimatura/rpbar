@@ -25,6 +25,6 @@
 #define RPBAR_MAINBGCOLOR           "#202020"
 #define RPBAR_MAINFGCOLOR           "#76ff00"
 
-#define RPBAR_FONT_STR              "-*-terminus-medium-r-normal-*-12-*-*-*-*-*-*-*"
+#define RPBAR_FONT_STR "monospace:size=10"
 
 #endif /* end of include guard: SETTINGS_N7KJ765I */
