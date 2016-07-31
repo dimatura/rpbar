@@ -193,6 +193,7 @@ RpBar::init_font(const char *fontstr) {
   if (!xft_font) {
     throw RpBarException("Font not found");
   }
+
   xft_fonts.push_back(xft_font);
 
   fc_pattern = FcNameParse((FcChar8 *) fontstr);
@@ -510,12 +511,6 @@ RpBar::load_font_for_codepoint(long codepoint)
     return NULL;
   }
 
-  if (!FcPatternAddBool(fc_pattern_dup, FC_SCALABLE, FcTrue)) {
-    FcCharSetDestroy(fc_charset);
-    FcPatternDestroy(fc_pattern_dup);
-    return NULL;
-  }
-
   if (!FcConfigSubstitute(NULL, fc_pattern_dup, FcMatchPattern)) {
     FcCharSetDestroy(fc_charset);
     FcPatternDestroy(fc_pattern_dup);
@@ -572,6 +567,7 @@ void RpBar::select_window(int win_ix) {
 } /* end namespace rpbar */
 
 int main(int argc, const char *argv[]) {
+  setlocale(LC_CTYPE, "");
   rpbar::RpBar rpbar;
   rpbar.run();
 
