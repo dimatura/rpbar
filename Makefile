@@ -1,23 +1,28 @@
 CXX=g++
 CXXFLAGS=-Os -Wall
-LIBS=-lX11
+LIBS=-lX11 -lXft -lfontconfig
+INCLUDES=`pkg-config --cflags fontconfig`
 
 BIN=rpbar rpbarsend
 
 all: ${BIN}
 
 .cc.o:
-	@${CXX} -c ${CXXFLAGS} $<
+	${CXX} -c ${CXXFLAGS} $<
 
-rpbar.o: rpbar.cc rpbar.hh settings.hh
+rpbar.o: rpbar.cc rpbar.hh settings.hh drw.h
+	${CXX} -c ${CXXFLAGS} ${INCLUDES} $<
 
-rpbar: rpbar.o
+drw.o: drw.c drw.h
+	${CXX} -c ${CXXFLAGS} drw.c
+
+rpbar: rpbar.o drw.o
 	${CXX} -o $@ $^ ${LIBS}
 
 rpbarsend.o: rpbarsend.cc
 
 rpbarsend: rpbarsend.o settings.hh
-	${CXX} -o $@ $^ ${LIBS}
+	${CXX} -o $@ $^
 
 clean:
 	rm -f *.o ${BIN}
