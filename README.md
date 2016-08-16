@@ -39,12 +39,13 @@ rpbar is a pretty simple C++ project. It consists of two executables:
 Compilation and usage
 ---------------------
 
-Obviously, you should have a working g++ toolchain. You'll also need Xlib. If
-you're using Ubuntu or Debian, what you need is in build-essential and libx11-dev.
+Obviously, you should have a working g++ toolchain. You'll also need Xlib and
+Xft. If you're using Ubuntu or Debian, what you need is in the
+`build-essential`, `libx11-dev` and `libxft-dev` apt packages.
 Then you should:
 
 1. Type `make` to compile.
-1. Put `rpbar` and `rpbarsend` in your path. 
+1. Put `rpbar` and `rpbarsend` in your path.
 1. Add the following to your `.ratpoisonrc`:
 
         # tell ratpoison to ignore rpbar
@@ -69,6 +70,15 @@ Now, what if you don't like the colors? The font size? The bar height?  Right
 now, the only way to change them is changing `settings.hh` and recompiling, a
 la dwm. I know, it's unfriendly. I'll eventually add the capability to read a
 config file at startup and/or take command line arguments.
+
+
+
+Thanks
+---------
+
+- [horgh](https://github.com/horgh) for revamping font drawing with Xft
+
+
 
 Status
 ----------
