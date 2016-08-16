@@ -18,6 +18,7 @@
 #ifndef RPBAR_Y2DAPIQS
 #define RPBAR_Y2DAPIQS
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -27,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include <fontconfig/fontconfig.h>
+#include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -42,14 +45,6 @@ public:
     std::runtime_error(what_arg) { }
 };
 
-struct Font {
-  XFontStruct *xfont;
-  XFontSet set;
-  int ascent;
-  int descent;
-  int height;
-};
-
 class RpBar {
 public:
   RpBar() { }
@@ -61,17 +56,46 @@ private:
   RpBar& operator=(const RpBar& other);
 
   void init_socket();
-  void init_font(const char *fontstr);
+
+  void
+  init_font(const char *fontstr);
+
+  XftFont *
+  load_font_by_pattern(FcPattern * const);
+
+  int
+  get_font_height();
+
   void init_gui();
 
   void refresh();
+
+  int
+  draw_text(const int, const int, const char * const,
+    const char * const, const bool);
+
+  bool
+  draw_character(XftDraw *, const XftColor,
+    int * const, const int, const char * const, size_t * const,
+    const bool);
+
+  XftFont *
+  load_font_for_codepoint(long);
+
   void handle_fd();
   void handle_timeout();
   void handle_xev();
   void select_window(int win_ix);
 
   void get_rp_info();
-  int text_width(const std::string& text);
+
+  int
+  text_width_in_font(XftFont * const, const char * const,
+    const int);
+
+  int
+  text_width(const char * const);
+
   unsigned long get_color(const char *colstr);
 
   // this class does too much stuff.
@@ -87,12 +111,13 @@ private:
   std::vector<std::string> windows;
 
   // X stuff
-  Font font;
-	Drawable drawable;
-	GC gc;
+  Drawable drawable;
+  GC gc;
   Display *display;
   int screen;
   Window root, win;
+  std::vector<XftFont *> xft_fonts;
+  FcPattern * fc_pattern;
 };
 
 void rstrip(char *s);
