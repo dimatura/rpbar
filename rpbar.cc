@@ -149,6 +149,9 @@ void RpBar::handle_xev() {
         break;
       case ButtonPress:
         // figure out which 'button' was pressed
+        if (bar_w == 0) {
+          break;
+        }
         win_ix = (ev.xbutton.x*windows.size())/bar_w;
         select_window(win_ix);
         break;
@@ -304,7 +307,16 @@ void RpBar::get_rp_info() {
     rstrip(buffer);
     windows.push_back(std::string(buffer));
   }
-  pclose(stream);
+
+  int const status = pclose(stream);
+  if (status == -1) {
+    std::string error = "error starting ratpoison: " +
+      std::string(strerror(errno));
+    throw RpBarException(error);
+  }
+  if (status != 0) {
+    throw RpBarException("ratpoison exited with non-zero status");
+  }
 }
 
 void RpBar::refresh(){
@@ -312,7 +324,10 @@ void RpBar::refresh(){
   XSetForeground(display, gc, bordercolor);
   XFillRectangle(display, drawable, gc, 0, 0, bar_w, bar_h);
 
-  int button_width = bar_w/windows.size();
+  int button_width = bar_w;
+  if (windows.size() != 0) {
+    button_width = bar_w/windows.size();
+  }
   int curx = 0;
 
   for (std::vector<std::string>::iterator itr = windows.begin();
