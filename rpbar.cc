@@ -307,7 +307,16 @@ void RpBar::get_rp_info() {
     rstrip(buffer);
     windows.push_back(std::string(buffer));
   }
-  pclose(stream);
+
+  int const status = pclose(stream);
+  if (status == -1) {
+    std::string error = "error starting ratpoison: " +
+      std::string(strerror(errno));
+    throw RpBarException(error);
+  }
+  if (status != 0) {
+    throw RpBarException("ratpoison exited with non-zero status");
+  }
 }
 
 void RpBar::refresh(){
