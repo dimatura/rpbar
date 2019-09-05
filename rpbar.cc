@@ -236,7 +236,7 @@ void RpBar::init_gui() {
   window_attribs.event_mask = ExposureMask | ButtonPressMask;
   bar_h = get_font_height() + RPBAR_PADDING;
   bar_x = 0;
-  bar_y = DisplayHeight(display, screen) - bar_h;
+  bar_y = RPBAR_TOP ? 0 : DisplayHeight(display, screen) - bar_h;
   bar_w = DisplayWidth(display, screen);
   win = XCreateWindow(display, root, bar_x, bar_y, bar_w, bar_h, 0,
                       DefaultDepth(display, screen), CopyFromParent,
